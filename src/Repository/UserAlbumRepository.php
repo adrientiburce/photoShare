@@ -19,6 +19,19 @@ class UserAlbumRepository extends ServiceEntityRepository
         parent::__construct($registry, UserAlbum::class);
     }
 
+    public function findEditableFromUser($user, $id)
+    {
+        return $this->createQueryBuilder('userAlbum')
+            ->andWhere('userAlbum.id = :id')
+            ->setParameter('id', $id)
+            ->andWhere('userAlbum.user = :user')
+            ->setParameter('user', $user)
+            ->andWhere('userAlbum.isEditable = :true')
+            ->setParameter('true', true)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     // /**
     //  * @return UserAlbum[] Returns an array of UserAlbum objects
     //  */
