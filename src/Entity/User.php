@@ -69,15 +69,6 @@ class User implements UserInterface
      */
     private $myPhotos;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="friendsWithMe")
-     */
-    private $friends;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="friends")
-     */
-    private $friendsWithMe;
 
     public function __construct()
     {
@@ -314,58 +305,6 @@ class User implements UserInterface
 
         return $this;
     }
+    
 
-    /**
-     * @return Collection|self[]
-     */
-    public function getFriends(): Collection
-    {
-        return $this->friends;
-    }
-
-    public function addFriend(self $friend): self
-    {
-        if (!$this->friends->contains($friend)) {
-            $this->friends[] = $friend;
-        }
-
-        return $this;
-    }
-
-    public function removeFriend(self $friend): self
-    {
-        if ($this->friends->contains($friend)) {
-            $this->friends->removeElement($friend);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|self[]
-     */
-    public function getFriendsWithMe(): Collection
-    {
-        return $this->friendsWithMe;
-    }
-
-    public function addFriendsWithMe(self $friendsWithMe): self
-    {
-        if (!$this->friendsWithMe->contains($friendsWithMe)) {
-            $this->friendsWithMe[] = $friendsWithMe;
-            $friendsWithMe->addFriend($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFriendsWithMe(self $friendsWithMe): self
-    {
-        if ($this->friendsWithMe->contains($friendsWithMe)) {
-            $this->friendsWithMe->removeElement($friendsWithMe);
-            $friendsWithMe->removeFriend($this);
-        }
-
-        return $this;
-    }
 }
