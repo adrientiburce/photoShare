@@ -45,14 +45,29 @@ class User implements UserInterface
     private $confirmPassword;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Album", mappedBy="owner")
-     */
-    private $albums;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Friendship", mappedBy="user")
+     */
+    private $friends;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Friendship", mappedBy="friend")
+     */
+    private $friendsWithMe;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserAlbum", mappedBy="user")
+     */
+    private $userAlbums;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Photo", mappedBy="owner")
+     */
+    private $myPhotos;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="friendsWithMe")
@@ -69,6 +84,8 @@ class User implements UserInterface
         $this->albums = new ArrayCollection();
         $this->friends = new ArrayCollection();
         $this->friendsWithMe = new ArrayCollection();
+        $this->userAlbums = new ArrayCollection();
+        $this->myPhotos = new ArrayCollection();
     }
 
     /**
@@ -165,34 +182,6 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection|Album[]
-     */
-    public function getAlbums(): Collection
-    {
-        return $this->albums;
-    }
-
-    public function addAlbum(Album $album): self
-    {
-        if (!$this->albums->contains($album)) {
-            $this->albums[] = $album;
-            $album->addOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAlbum(Album $album): self
-    {
-        if ($this->albums->contains($album)) {
-            $this->albums->removeElement($album);
-            $album->removeOwner($this);
-        }
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -201,6 +190,127 @@ class User implements UserInterface
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Friendship[]
+     */
+    public function getFriends(): Collection
+    {
+        return $this->friends;
+    }
+
+    public function addFriend(Friendship $friend): self
+    {
+        if (!$this->friends->contains($friend)) {
+            $this->friends[] = $friend;
+            $friend->setFriendsWithMe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFriend(Friendship $friend): self
+    {
+        if ($this->friends->contains($friend)) {
+            $this->friends->removeElement($friend);
+            // set the owning side to null (unless already changed)
+            if ($friend->getFriendsWithMe() === $this) {
+                $friend->setFriendsWithMe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Friendship[]
+     */
+    public function getFriendsWithMe(): Collection
+    {
+        return $this->friendsWithMe;
+    }
+
+    public function addFriendsWithMe(Friendship $friendsWithMe): self
+    {
+        if (!$this->friendsWithMe->contains($friendsWithMe)) {
+            $this->friendsWithMe[] = $friendsWithMe;
+            $friendsWithMe->setFriend($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFriendsWithMe(Friendship $friendsWithMe): self
+    {
+        if ($this->friendsWithMe->contains($friendsWithMe)) {
+            $this->friendsWithMe->removeElement($friendsWithMe);
+            // set the owning side to null (unless already changed)
+            if ($friendsWithMe->getFriend() === $this) {
+                $friendsWithMe->setFriend(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserAlbum[]
+     */
+    public function getUserAlbums(): Collection
+    {
+        return $this->userAlbums;
+    }
+
+    public function addUserAlbum(UserAlbum $userAlbum): self
+    {
+        if (!$this->userAlbums->contains($userAlbum)) {
+            $this->userAlbums[] = $userAlbum;
+            $userAlbum->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAlbum(UserAlbum $userAlbum): self
+    {
+        if ($this->userAlbums->contains($userAlbum)) {
+            $this->userAlbums->removeElement($userAlbum);
+            // set the owning side to null (unless already changed)
+            if ($userAlbum->getUser() === $this) {
+                $userAlbum->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Photo[]
+     */
+    public function getMyPhotos(): Collection
+    {
+        return $this->myPhotos;
+    }
+
+    public function addMyPhoto(Photo $myPhoto): self
+    {
+        if (!$this->myPhotos->contains($myPhoto)) {
+            $this->myPhotos[] = $myPhoto;
+            $myPhoto->addOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyPhoto(Photo $myPhoto): self
+    {
+        if ($this->myPhotos->contains($myPhoto)) {
+            $this->myPhotos->removeElement($myPhoto);
+            $myPhoto->removeOwner($this);
+        }
 
         return $this;
     }

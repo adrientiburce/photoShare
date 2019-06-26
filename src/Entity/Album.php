@@ -24,9 +24,14 @@ class Album
     private $title;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="albums")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserAlbum", mappedBy="album")
      */
-    private $owner;
+    private $userAlbums;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Mosaic", mappedBy="album", orphanRemoval=true)
+     */
+    private $mosaics;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Photo", inversedBy="albums")
@@ -36,7 +41,8 @@ class Album
     public function __construct()
     {
         $this->owner = new ArrayCollection();
-        $this->photos = new ArrayCollection();
+        $this->userAlbums = new ArrayCollection();
+        $this->mosaics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,26 +63,62 @@ class Album
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|UserAlbum[]
      */
-    public function getOwner(): Collection
+    public function getUserAlbums(): Collection
     {
-        return $this->owner;
+        return $this->userAlbums;
     }
 
-    public function addOwner(User $owner): self
+    public function addUserAlbum(UserAlbum $userAlbum): self
     {
-        if (!$this->owner->contains($owner)) {
-            $this->owner[] = $owner;
+        if (!$this->userAlbums->contains($userAlbum)) {
+            $this->userAlbums[] = $userAlbum;
+            $userAlbum->setAlbum($this);
         }
 
         return $this;
     }
 
-    public function removeOwner(User $owner): self
+    public function removeUserAlbum(UserAlbum $userAlbum): self
     {
-        if ($this->owner->contains($owner)) {
-            $this->owner->removeElement($owner);
+        if ($this->userAlbums->contains($userAlbum)) {
+            $this->userAlbums->removeElement($userAlbum);
+            // set the owning side to null (unless already changed)
+            if ($userAlbum->getAlbum() === $this) {
+                $userAlbum->setAlbum(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Mosaic[]
+     */
+    public function getMosaics(): Collection
+    {
+        return $this->mosaics;
+    }
+
+    public function addMosaic(Mosaic $mosaic): self
+    {
+        if (!$this->mosaics->contains($mosaic)) {
+            $this->mosaics[] = $mosaic;
+            $mosaic->setAlbum($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMosaic(Mosaic $mosaic): self
+    {
+        if ($this->mosaics->contains($mosaic)) {
+            $this->mosaics->removeElement($mosaic);
+            // set the owning side to null (unless already changed)
+            if ($mosaic->getAlbum() === $this) {
+                $mosaic->setAlbum(null);
+            }
         }
 
         return $this;
