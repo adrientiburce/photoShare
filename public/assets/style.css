@@ -1,8 +1,19 @@
+* {
+    box-sizing: border-box;
+}
+
 main {
     padding-top: 5rem;
 }
 
-.starter-template {
-    padding: 3rem 1.5rem;
-    text-align: center;
+.block-2-column {
+    display: flex;
+    justify-content: space-around;
+}
+
+.container-photo {
+    border: 2px solid #404040;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px 10px;
 }

@@ -51,31 +51,34 @@
     </div>
 </nav>
 
-<main role="main" class="container">
-    {% for success_message in app.flashes('success') %}
-        <div class="alert alert-success alert-dismissible">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Opération réussie!</strong> {{ success_message }}
-        </div>
-    {% endfor %}
-    {% for info_message in app.flashes('info') %}
-        <div class="alert alert-info alert-dismissible">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Info!</strong> {{ info_message }}
-        </div>
-    {% endfor %}
-    {% for warning_message in app.flashes('warning') %}
-        <div class="alert alert-warning alert-dismissible">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Attention !</strong> {{ warning_message }}
-        </div>
-    {% endfor %}
-    {% for danger_message in app.flashes('danger') %}
-        <div class="alert alert-danger alert-dismissible">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Danger!</strong> {{ danger_message }}
-        </div>
-    {% endfor %}
+<main role="main">
+    <div class="container">
+        {% for success_message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Opération réussie!</strong> {{ success_message }}
+            </div>
+        {% endfor %}
+        {% for info_message in app.flashes('info') %}
+            <div class="alert alert-info alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Info!</strong> {{ info_message }}
+            </div>
+        {% endfor %}
+        {% for warning_message in app.flashes('warning') %}
+            <div class="alert alert-warning alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Attention !</strong> {{ warning_message }}
+            </div>
+        {% endfor %}
+        {% for danger_message in app.flashes('danger') %}
+            <div class="alert alert-danger alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Danger!</strong> {{ danger_message }}
+            </div>
+        {% endfor %}
+    </div>
+
     {% block body %}{% endblock %}
 
 </main>
