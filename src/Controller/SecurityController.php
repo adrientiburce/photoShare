@@ -58,15 +58,12 @@ class SecurityController extends AbstractController
                 return $this->redirectToRoute('register');
             }
             $hash = $this->passwordEncoder->encodePassword($user, $user->getPassword());
+            $user->setCreatedAt(new \DateTime());
             $user->setPassword($hash);
 
             $manager->persist($user);
             $manager->flush();
-
-            $this->addFlash(
-                'success',
-                'Utilisateur créé avec succés '
-            );
+            $this->addFlash('success', 'Utilisateur créé avec succés ');
             return $this->redirectToRoute('app_login');
         }
         return $this->render('security/register.html.twig', [

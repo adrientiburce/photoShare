@@ -5,19 +5,17 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomeController extends AbstractController
+class AlbumController extends AbstractController
 {
     /**
-     * @Route("/", name="home")
+     * @Route("/album", name="album_home")
      */
     public function index()
     {
         $user = $this->getUser();
-
-        return $this->render('home/index.html.twig', [
-            'controller_name' => 'Lucia',
+        return $this->render('album/index.html.twig', [
+            'controller_name' => 'AlbumController',
             'user' => $user,
         ]);
     }
-
 }

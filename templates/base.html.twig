@@ -13,7 +13,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="{{path('home')}}">PhotoShare</a>
+    <a class="navbar-brand" href="{{ path('home') }}">PhotoShare</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mobileNavbar"
             aria-controls="mobileNavbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -21,26 +21,33 @@
 
     <div class="collapse navbar-collapse" id="mobileNavbar">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#">Mes Albums</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Mon Compte</a>
-            </li>
             {% if app.user %}
                 <li class="nav-item">
-                    <a class="nav-link" id="nav__logout" href="{{path('app_logout')}}">Déconnexion </a>
+                    <a class="nav-link" href="{{ path('album_home') }}">Mes Albums</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('photo_home') }}">Mes Photos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('profile_home') }}">Mon Compte</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="nav__logout" href="{{ path('app_logout') }}">Déconnexion </a>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link link-login" href="{{path('app_login')}}">Connexion </a>
+                    <a class="nav-link link-login" href="{{ path('app_login') }}">Connexion </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{path('register')}}">Inscription </a>
+                    <a class="nav-link" href="{{ path('register') }}">Inscription </a>
                 </li>
             {% endif %}
-
         </ul>
+        <span class="navbar-text">
+            {% if app.user %}
+                Bonjour {{ app.user.email }}
+            {% endif %}
+        </span>
     </div>
 </nav>
 
@@ -48,25 +55,25 @@
     {% for success_message in app.flashes('success') %}
         <div class="alert alert-success alert-dismissible">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Opération réussie!</strong> {{success_message}}
+            <strong>Opération réussie!</strong> {{ success_message }}
         </div>
     {% endfor %}
     {% for info_message in app.flashes('info') %}
         <div class="alert alert-info alert-dismissible">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Info!</strong> {{info_message}}
+            <strong>Info!</strong> {{ info_message }}
         </div>
     {% endfor %}
     {% for warning_message in app.flashes('warning') %}
         <div class="alert alert-warning alert-dismissible">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Attention !</strong> {{warning_message}}
+            <strong>Attention !</strong> {{ warning_message }}
         </div>
     {% endfor %}
     {% for danger_message in app.flashes('danger') %}
         <div class="alert alert-danger alert-dismissible">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-            <strong>Danger!</strong> {{danger_message}}
+            <strong>Danger!</strong> {{ danger_message }}
         </div>
     {% endfor %}
     {% block body %}{% endblock %}

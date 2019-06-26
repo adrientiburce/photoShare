@@ -23,6 +23,7 @@ class UserFixtures extends Fixture
         $user = new User();
         $hash = $this->passwordEncoder->encodePassword($user, 'solene');
         $user->setEmail('solene@gmail.com');
+        $user->setCreatedAt(new \DateTime());
         $user->setPassword($hash);
 
         $manager->persist($user);

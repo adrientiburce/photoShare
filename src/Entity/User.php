@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,6 +43,21 @@ class User implements UserInterface
      * @Assert\EqualTo(propertyPath="password", message="Vos mot de passe sont différents")
      */
     private $confirmPassword;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Album", mappedBy="owner")
+     */
+    private $albums;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    public function __construct()
+    {
+        $this->albums = new ArrayCollection();
+    }
 
     /**
      * @return string
@@ -134,5 +151,45 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection|Album[]
+     */
+    public function getAlbums(): Collection
+    {
+        return $this->albums;
+    }
+
+    public function addAlbum(Album $album): self
+    {
+        if (!$this->albums->contains($album)) {
+            $this->albums[] = $album;
+            $album->addOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlbum(Album $album): self
+    {
+        if ($this->albums->contains($album)) {
+            $this->albums->removeElement($album);
+            $album->removeOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
     }
 }

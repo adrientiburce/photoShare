@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ProfileController!{% endblock %}
+
+{% block body %}
+
+
+    <h1>Mon Compte</h1>
+
+    <h3>A propos de moi </h3>
+
+    <h3>Informations </h3>
+
+    <h4 class="text-right text-secondary">Compte crée le {{ app.user.createdAt|date("d/m/Y") }}</h4>
+
+    <table class="table table-hover">
+        <tbody>
+        <tr>
+            <th>Email</th>
+            <td> {{ app.user.email }}</td>
+        </tr>
+        <tr>
+            <th>Mot de Passe</th>
+            <td>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#changePass">
+                    Modifier
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Mes amis </h3>
+
+
+    {% include 'profile/change_password.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            if({{ isPassModalOpen|default(false) }}) {
+                $('#changePass').modal('show');
+            }
+        });
+    </script>
+{% endblock %}
