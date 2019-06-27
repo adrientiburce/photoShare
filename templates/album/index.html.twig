@@ -79,7 +79,7 @@
             {% set imgSrc = (album.mosaics|length) ? "../uploads/img/" ~ album.mosaics[0].photo.imageName : "../images/empty-album.png" %}
             <div class="thumbnail img-thumbnail">
                 <div class="frame" style="background-image:url('{{ imgSrc }}')"
-                     onclick="window.location='{{ path('album_view', {"id":userAlbum.id}) }}';"></div>
+                     {% if userAlbum.isEditable %} onclick="window.location='{{ path('album_view', {"id":userAlbum.id}) }}';" {% endif %}></div>
                 <div class="title">
                     <span class="title_text">{{ album.title }}</span>
                     <div class="dropdown">

@@ -3,87 +3,26 @@
 {% block title %}PhotoShare - {{ album.title }}{% endblock %}
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="../assets/album.css">
     <style type="text/css">
-        /*        .upload-area{
-                    width: 100%;
-                    min-height: 200px;
-                    border: 2px solid lightgray;
-                    border-radius: 3px;
-                    text-align: center;
-                }
-        */
-        .upload-area h1{
-            text-align: center;
-            font-weight: normal;
-            font-family: sans-serif;
-            line-height: 50px;
-            color: darkslategray;
-        }
-        #file{
-            display: none;
-        }
-        .thumbnail {
-            margin: 10px;
-            width: 20%;
-            min-width: 16em;
-            border-radius: 10px;
-            /*box-shadow: 0 2px 6px 0 #c3c3c3;*/
-            border: 1px solid #dfe1e5;
-            padding: 5px;
-            transition: all 0.5s;
-        }
-        .thumbnail:hover {
-            transform: scale(1.05);
-        }
-        .photo{
-            position: relative;
-        }
-        .photo.selected::after {
-            position: absolute;
-            background-color: #00a5ff;
-            width: 12px;
-            height: 12px;
-            content: "";
-            bottom: 5px;
-            right: 5px;
-            border-radius: 7px;
-            border: 1px solid white;
-        }
-        .upload-area {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            padding: 5px;
-            border-radius: 10px;
-            border: 3px solid transparent;
-            background-color: white;
-            transition: all 0.2s;
-        }
+
         .modal-body {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
         }
-        #upload-btn:hover{
+
+        .editable{
             cursor: pointer;
         }
-        .title{
-            font-size:12px;
-        }
-        img{
-            width: 100%;
-            border-radius: 10px;
-        }
-        /*        img:hover {
-                    transform: scale(1.1);
-                }*/
+
+
     </style>
 {% endblock %}
 {% block body %}
 
-    <h1 class="text-center display-4 text-secondary">Album : {{ album.title }}</h1>
+    <h1 class="display-4 text-secondary">Album : <span class="editable">{{ album.title }}</span></h1>
     {% if userAlbum.isowner %}
         <h2 class="text-right text-info"><i class="fas fa-user-shield"></i>&nbsp;Administrateur</h2>
     {% else %}
@@ -224,49 +163,50 @@
             }
             $("#exampleModal").modal("hide");
         };
-        /* Code provenant de l'électif WEB 2.0 */
-        var jTa = $("<input>")
+        
+        /* Edition du titre de l'album 
+           code inspiré de celui de l'électif WEB 2.0 */
+        var inputEditable = $("<input>")
             .click(function(){$(this).select();})
             .keydown(function(contexte){
                 if (contexte.key == "Enter" && $(this).val()) {
                     var contenu = $(this).val();
-                    var jPClone = $("<span class='editable'>").html(contenu);
-                    // jPClone.data($(this).data());
-                    // jPClone.data("contenu",contenu);
-                    $(this).replaceWith(jPClone);
-                    persister(jPClone);
+                    var spanEditable = $("<span class='editable'>").html(contenu);
+                    $(this).replaceWith(spanEditable);
+                    save(spanEditable);
 
                 }
             });
-        function persister(jLeParagraphe) {
+
+        function save(spanEditable) {
             // Interdire les futures modif
-            jLeParagraphe.data("disabled",true);
-            jLeParagraphe.addClass("disabled");
+            spanEditable.data("disabled",true);
+            spanEditable.addClass("disabled");
             var userAlbumId = '{{ userAlbumId }}';
             // Envoyer la requete
             $.ajax({
                 type: "POST",
                 url: "{{ path('album_set_title', {'id':userAlbumId}) }}" ,
-                data: {title : jLeParagraphe.html()},
+                data: {title : spanEditable.html()},
                 success: function(oRep){
                     // OK !
                     // Il faut maj le P dans la structure
-                    jLeParagraphe.removeClass("disabled");
-                    jLeParagraphe.data("disabled",false);
+                    spanEditable.removeClass("disabled");
+                    spanEditable.data("disabled",false);
                 },
                 dataType: "json"
             });
 
         }
+
         $(document).on("click",".editable", function(){
-            console.log("clic sur "  + $(this).html());
             // Si l'élément est désactivé, on ne fait rien...
             if ($(this).data("disabled")) return;
+            
             var contenu = $(this).html();
-            var jTaClone = jTa.clone(true).val(contenu);
-            // jTaClone.data($(this).data());
-            $(this).replaceWith(jTaClone);
-            jTaClone.focus();
+            var newImputEditable = inputEditable.clone(true).val(contenu);
+            $(this).replaceWith(newImputEditable);
+            newImputEditable.focus();
         });
     </script>
 {% endblock %}

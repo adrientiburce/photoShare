@@ -1,0 +1,66 @@
+.thumbnail {
+    margin: 10px;
+    width: 20%;
+    min-width: 16em;
+    border-radius: 10px;
+    /*box-shadow: 0 2px 6px 0 #c3c3c3;*/
+    border: 1px solid #dfe1e5;
+    padding: 5px;
+    transition: all 0.5s;
+}
+
+#file{
+    display: none;
+}
+
+.photo{
+    position: relative;
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.photo.selected::after {
+    position: absolute;
+    background-color: #00a5ff;
+    width: 12px;
+    height: 12px;
+    content: "";
+    bottom: 5px;
+    right: 5px;
+    border-radius: 7px;
+    border: 1px solid white;
+}
+
+.upload-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: 10px;
+    border: 3px solid transparent;
+    background-color: white;
+    transition: all 0.2s;
+    margin-bottom: 4em;
+}
+
+#upload-btn:hover{
+    cursor: pointer;
+}
+
+.title{
+    font-size:12px;
+}
+
+img{
+    width: 100%;
+    border-radius: 10px;
+    /* Pour enlever le filtre bleu lors du clic sur l'image*/
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
