@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}PhotoShare - Nouvel Album{% endblock %}
+{% block title %}PhotoShare - {{ album.title }}{% endblock %}
 {% block stylesheets %}
     {{ parent() }}
     <style type="text/css">
-/*        .upload-area{
-            width: 100%;
-            min-height: 200px;
-            border: 2px solid lightgray;
-            border-radius: 3px;
-            text-align: center;
-        }
-*/
+        /*        .upload-area{
+                    width: 100%;
+                    min-height: 200px;
+                    border: 2px solid lightgray;
+                    border-radius: 3px;
+                    text-align: center;
+                }
+        */
         .upload-area h1{
             text-align: center;
             font-weight: normal;
@@ -19,11 +19,9 @@
             line-height: 50px;
             color: darkslategray;
         }
-
         #file{
             display: none;
         }
-
         .thumbnail {
             margin: 10px;
             width: 20%;
@@ -32,17 +30,14 @@
             /*box-shadow: 0 2px 6px 0 #c3c3c3;*/
             border: 1px solid #dfe1e5;
             padding: 5px;
-            transition: all 0.5s;     
+            transition: all 0.5s;
         }
-
         .thumbnail:hover {
             transform: scale(1.05);
         }
-
         .photo{
             position: relative;
         }
-
         .photo.selected::after {
             position: absolute;
             background-color: #00a5ff;
@@ -54,7 +49,6 @@
             border-radius: 7px;
             border: 1px solid white;
         }
-
         .upload-area {
             display: flex;
             flex-wrap: wrap;
@@ -66,36 +60,97 @@
             background-color: white;
             transition: all 0.2s;
         }
-
         .modal-body {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
         }
-
         #upload-btn:hover{
             cursor: pointer;
         }
-
         .title{
             font-size:12px;
         }
-
         img{
             width: 100%;
             border-radius: 10px;
         }
-
-/*        img:hover {
-            transform: scale(1.1);
-        }*/
-
+        /*        img:hover {
+                    transform: scale(1.1);
+                }*/
     </style>
 {% endblock %}
 {% block body %}
 
-    <h1 class="display-4 text-secondary">Album : <span class="editable"> {{album.title}}</span></h1>
+    <h1 class="text-center display-4 text-secondary">Album : {{ album.title }}</h1>
+    {% if userAlbum.isowner %}
+        <h2 class="text-right text-info"><i class="fas fa-user-shield"></i>&nbsp;Administrateur</h2>
+    {% else %}
+        <h2 class="text-right text-info"><i class="fas fa-user-edit"></i>&nbsp; Contributeur</h2>
+    {% endif %}
+
+{#         A D M I N   DE L'ALBUM#}
+    {% if userAlbum.isOwner %}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shareAlbum">
+            Partager
+        </button>
+        {% include 'album/share_modal.html.twig' %}
+
+        <h3 class="text-info mt-2">Mes Partages</h3>
+        {% if allUserAlbum|length > 0 %}
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Amis</th>
+                    <th>Autorisation</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+                </thead>
+
+                {% for externUserAlbum in allUserAlbum %}
+                    <tbody>
+                    <tr>
+                        <td>{{ externUserAlbum.user.email }}</td>
+                        <td>
+                            {% if externUserAlbum.isEditable %}
+                                <i class="fas fa-user-edit"></i>&nbsp;Edition
+                            {% else %}
+                                <i class="far fa-user"></i>&nbsp;Consultation
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{{ path('user_album_delete', {'id': externUserAlbum.id}) }}"
+                                  onsubmit="
+                    return confirm('Etes-vous sûr de supprimer le partage ?')">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="current_user_album" value="{{userAlbum.id}}">
+                                <button class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" action="{{ path('user_album_update', {'id': externUserAlbum.id}) }}">
+                                <input type="hidden" name="_method" value="POST">
+                                <input type="hidden" name="current_user_album" value="{{userAlbum.id}}">
+                                <button class="btn btn-outline-success btn-sm">
+                                    {% if externUserAlbum.isEditable %}
+                                        Enlever l'édition
+                                    {% else %}
+                                        Ajouter l'édition
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Vous avez acutellement aucun partage</p>
+        {% endif %}
+    {% endif %}
 
     <div>
         <p id="drop-info"> Vous pouvez glisser-déposer vos photos pour les ajouter</p>
@@ -106,11 +161,11 @@
             </div>
             {% set photoIds = [] %}
             {% for mosaic in album.mosaics %}
-            <div class="thumbnail">
-                {% set photoIds = photoIds|merge([mosaic.photo.id]) %}
-                <img src="{{ "../uploads/img/" ~ mosaic.photo.imageName }}">
-                <span class="title">{{ mosaic.title }}</span>
-            </div>
+                <div class="thumbnail">
+                    {% set photoIds = photoIds|merge([mosaic.photo.id]) %}
+                    <img src="{{ "../uploads/img/" ~ mosaic.photo.imageName }}">
+                    <span class="title">{{ mosaic.title }}</span>
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -119,28 +174,28 @@
     <!-- Modal -->
     <div class="modal fade modal-doc" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Sélectionnez des images parmi vos photos</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Sélectionnez des images parmi vos photos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% for photo in app.user.myPhotos %}
+                        {% if not (photo.id in photoIds) %}
+                            <div class="photo thumbnail" data-id="{{ photo.id }}">
+                                <img src="{{ "../uploads/img/" ~ photo.imageName }}">
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <span id="photos-selected"></span>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" id="create-album" disabled>Ajouter</button>
+                </div>
             </div>
-            <div class="modal-body">
-                {% for photo in app.user.myPhotos %}
-                    {% if not (photo.id in photoIds) %}
-                    <div class="photo thumbnail" data-id="{{ photo.id }}">
-                        <img src="{{ "../uploads/img/" ~ photo.imageName }}">
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <div class="modal-footer">
-                <span id="photos-selected"></span>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="create-album" disabled>Ajouter</button>
-            </div>
-          </div>
         </div>
     </div>
 
@@ -149,81 +204,68 @@
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
-{{ include('photo/_drag_js.html.twig')}}
-<script type="text/javascript" src="../assets/add-photos.js"></script>
-<script type="text/javascript">
-    $(document).ready(function() {
-        var url = "{{ path('add_photo_to_album', {'id':userAlbumId}) }}";
-        addPhotos(url, callback);
-    });
-
-    function callback(Photos){
-        var mainDiv = $('#uploadfile');
-        for (var i = Photos.length - 1; i >= 0; i--) {
-            Photos[i].detach()
-                .appendTo(mainDiv)
-                .removeClass("photo")
-                .removeClass("selected")
-                .unbind("click");
-        }
-        $("#exampleModal").modal("hide");
-    };
-
-
-    /* Code provenant de l'électif WEB 2.0 */
-    var jTa = $("<input>")
-                .click(function(){$(this).select();})
-                .keydown(function(contexte){
-            if (contexte.key == "Enter" && $(this).val()) {
-                var contenu = $(this).val();
-                var jPClone = $("<span class='editable'>").html(contenu); 
-
-                // jPClone.data($(this).data());
-                // jPClone.data("contenu",contenu);
-
-                $(this).replaceWith(jPClone);
-                persister(jPClone);
-        
-            }
-        }); 
-
-    function persister(jLeParagraphe) {
-        // Interdire les futures modif 
-        jLeParagraphe.data("disabled",true);
-        jLeParagraphe.addClass("disabled");
-
-        var userAlbumId = '{{ userAlbumId }}';
-        // Envoyer la requete 
-        $.ajax({
-            type: "POST",
-            url: "{{ path('album_set_title', {'id':userAlbumId}) }}" ,
-            data: {title : jLeParagraphe.html()},
-            success: function(oRep){
-                // OK ! 
-                // Il faut maj le P dans la structure 
-                jLeParagraphe.removeClass("disabled");
-                jLeParagraphe.data("disabled",false);
-            },
-            dataType: "json"
+    {{ parent() }}
+    {{ include('photo/_drag_js.html.twig')}}
+    <script type="text/javascript" src="../assets/add-photos.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var url = "{{ path('add_photo_to_album', {'id':userAlbumId}) }}";
+            addPhotos(url, callback);
         });
-        
-    }
+        function callback(Photos){
+            var mainDiv = $('#uploadfile');
+            for (var i = Photos.length - 1; i >= 0; i--) {
+                Photos[i].detach()
+                    .appendTo(mainDiv)
+                    .removeClass("photo")
+                    .removeClass("selected")
+                    .unbind("click");
+            }
+            $("#exampleModal").modal("hide");
+        };
+        /* Code provenant de l'électif WEB 2.0 */
+        var jTa = $("<input>")
+            .click(function(){$(this).select();})
+            .keydown(function(contexte){
+                if (contexte.key == "Enter" && $(this).val()) {
+                    var contenu = $(this).val();
+                    var jPClone = $("<span class='editable'>").html(contenu);
+                    // jPClone.data($(this).data());
+                    // jPClone.data("contenu",contenu);
+                    $(this).replaceWith(jPClone);
+                    persister(jPClone);
 
-    $(document).on("click",".editable", function(){
-        console.log("clic sur "  + $(this).html());
+                }
+            });
+        function persister(jLeParagraphe) {
+            // Interdire les futures modif
+            jLeParagraphe.data("disabled",true);
+            jLeParagraphe.addClass("disabled");
+            var userAlbumId = '{{ userAlbumId }}';
+            // Envoyer la requete
+            $.ajax({
+                type: "POST",
+                url: "{{ path('album_set_title', {'id':userAlbumId}) }}" ,
+                data: {title : jLeParagraphe.html()},
+                success: function(oRep){
+                    // OK !
+                    // Il faut maj le P dans la structure
+                    jLeParagraphe.removeClass("disabled");
+                    jLeParagraphe.data("disabled",false);
+                },
+                dataType: "json"
+            });
 
-        // Si l'élément est désactivé, on ne fait rien... 
-        if ($(this).data("disabled")) return;
-
-        var contenu = $(this).html(); 
-        var jTaClone = jTa.clone(true).val(contenu); 
-
-           // jTaClone.data($(this).data());
-
-        $(this).replaceWith(jTaClone);
-        jTaClone.focus(); 
-    });
-
-</script>
+        }
+        $(document).on("click",".editable", function(){
+            console.log("clic sur "  + $(this).html());
+            // Si l'élément est désactivé, on ne fait rien...
+            if ($(this).data("disabled")) return;
+            var contenu = $(this).html();
+            var jTaClone = jTa.clone(true).val(contenu);
+            // jTaClone.data($(this).data());
+            $(this).replaceWith(jTaClone);
+            jTaClone.focus();
+        });
+    </script>
 {% endblock %}

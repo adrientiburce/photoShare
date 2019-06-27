@@ -19,6 +19,13 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function findAllFriends($user){
+        return $this->createQueryBuilder('user')
+            ->innerJoin('user.friendsWithMe', 'friends', 'WITH', 'friends.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('user.email', 'ASC');
+    }
+
     // /**
     //  * @return User[] Returns an array of User objects
     //  */

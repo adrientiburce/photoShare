@@ -31,6 +31,11 @@ class UserAlbum
      */
     private $isEditable;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isOwner;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,6 +73,18 @@ class UserAlbum
     public function setIsEditable(bool $isEditable): self
     {
         $this->isEditable = $isEditable;
+
+        return $this;
+    }
+
+    public function getIsOwner(): ?bool
+    {
+        return $this->isOwner;
+    }
+
+    public function setIsOwner(bool $isOwner): self
+    {
+        $this->isOwner = $isOwner;
 
         return $this;
     }

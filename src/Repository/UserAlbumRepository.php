@@ -32,6 +32,15 @@ class UserAlbumRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findAllShare($album)
+    {
+        return $this->createQueryBuilder('userAlbum')
+            ->andWhere('userAlbum.album = :album')
+            ->setParameter('album', $album)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return UserAlbum[] Returns an array of UserAlbum objects
     //  */

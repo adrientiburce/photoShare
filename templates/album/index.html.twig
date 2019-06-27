@@ -12,20 +12,20 @@
             height: 100%;
             background-position: center;
         }
-        
-		.thumbnail{
-			width: 200px;
-			height: 200px;
-			display: inline-block;
-			position: relative;
-			margin: 5px;
-			transition: all 0.5s;
-		}
 
-		.thumbnail:hover{
-			cursor: pointer;
-			transform: scale(1.1);
-		}
+        .thumbnail {
+            width: 200px;
+            height: 200px;
+            display: inline-block;
+            position: relative;
+            margin: 5px;
+            transition: all 0.5s;
+        }
+
+        .thumbnail:hover {
+            cursor: pointer;
+            transform: scale(1.1);
+        }
 
         .title {
             position: absolute;
@@ -58,6 +58,10 @@
             margin-left: 5px;
         }
 
+        .dropdown-menu {
+            z-index:500;
+        }
+
     </style>
 {% endblock %}
 
@@ -79,12 +83,14 @@
                 <div class="title">
                     <span class="title_text">{{ album.title }}</span>
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" data-toggle="modal" data-target="#showDiapoModal_{{ album.id }}"><i class="fas fa-play text-success"></i>&nbsp;Lire</a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-share text-primary"></i>&nbsp;Partager</a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-plus text-info"></i>&nbsp;Ajouter à "Mes Photos"</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#showDiapoModal_{{ album.id }}"><i
+                                        class="fas fa-play text-success"></i>&nbsp;Lire</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-plus text-info"></i>&nbsp;Ajouter à "Mes
+                                Photos"</a>
                         </div>
                     </div>
                 </div>
