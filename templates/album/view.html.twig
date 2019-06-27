@@ -95,7 +95,7 @@
 {% endblock %}
 {% block body %}
 
-    <h1 class="text-center display-4 text-secondary">Album : {{album.title}}</h1>
+    <h1 class="display-4 text-secondary">Album : <span class="editable"> {{album.title}}</span></h1>
 
     <div>
         <p id="drop-info"> Vous pouvez glisser-déposer vos photos pour les ajouter</p>
@@ -150,6 +150,7 @@
 
 {% block javascripts %}
 {{ parent() }}
+{{ include('photo/_drag_js.html.twig')}}
 <script type="text/javascript" src="../assets/add-photos.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -168,5 +169,61 @@
         }
         $("#exampleModal").modal("hide");
     };
+
+
+    /* Code provenant de l'électif WEB 2.0 */
+    var jTa = $("<input>")
+                .click(function(){$(this).select();})
+                .keydown(function(contexte){
+            if (contexte.key == "Enter" && $(this).val()) {
+                var contenu = $(this).val();
+                var jPClone = $("<span class='editable'>").html(contenu); 
+
+                // jPClone.data($(this).data());
+                // jPClone.data("contenu",contenu);
+
+                $(this).replaceWith(jPClone);
+                persister(jPClone);
+        
+            }
+        }); 
+
+    function persister(jLeParagraphe) {
+        // Interdire les futures modif 
+        jLeParagraphe.data("disabled",true);
+        jLeParagraphe.addClass("disabled");
+
+        var userAlbumId = '{{ userAlbumId }}';
+        // Envoyer la requete 
+        $.ajax({
+            type: "POST",
+            url: "{{ path('album_set_title', {'id':userAlbumId}) }}" ,
+            data: {title : jLeParagraphe.html()},
+            success: function(oRep){
+                // OK ! 
+                // Il faut maj le P dans la structure 
+                jLeParagraphe.removeClass("disabled");
+                jLeParagraphe.data("disabled",false);
+            },
+            dataType: "json"
+        });
+        
+    }
+
+    $(document).on("click",".editable", function(){
+        console.log("clic sur "  + $(this).html());
+
+        // Si l'élément est désactivé, on ne fait rien... 
+        if ($(this).data("disabled")) return;
+
+        var contenu = $(this).html(); 
+        var jTaClone = jTa.clone(true).val(contenu); 
+
+           // jTaClone.data($(this).data());
+
+        $(this).replaceWith(jTaClone);
+        jTaClone.focus(); 
+    });
+
 </script>
 {% endblock %}

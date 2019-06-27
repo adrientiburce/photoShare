@@ -134,4 +134,25 @@ class AlbumController extends AbstractController
     }
 
 
+    /**
+     * @Route("/album/{id}/titre", name="album_set_title", requirements={"id"="\d+"})
+     */
+    public function setTitle($id, Request $request, UserAlbumRepository $repo, ObjectManager $em)
+    {
+        $newTitle = $request->request->get('title');
+        $user = $this->getUser();
+        $userAlbum = $repo->findEditableFromUser($user, $id);
+        $album = $userAlbum->getAlbum();
+        $newTitle = ($newTitle == "") ? "Album sans titre" : $newTitle;
+        $album->setTitle($newTitle);
+        $em->persist($album);
+        $em->flush();
+
+        return new JsonResponse(array('success' => true));
+    }
+
+
+
+
+
 }
