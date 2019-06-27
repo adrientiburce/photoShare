@@ -2,8 +2,50 @@
 
 {% block body %}
 
-    <div class="example-wrapper">
-        <h1>Hello {{ user.email|default('Inconnu') }}! ✅</h1>
+    <h1 class="text-center display-4 text-secondary">Bienvenue sur PhotoShare</h1>
 
-    </div>
+    {% if app.user %}
+
+        {% if allFriends|length > 0 %}
+            <h3 class="text-info mt-2">Mes amis</h3>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Pseudo</th>
+                </tr>
+                </thead>
+                {% for friendship in allFriends %}
+
+                    <tbody>
+                    <tr>
+                        <td>{{ friendship.friend.email }}</td>
+                    </tr>
+
+                    </tbody>
+
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Vous avez acutellement aucun ami</p>
+        {% endif %}
+
+        <p>Pour un ajouter un amis veuillez, renseigner son adresse mail : </p>
+
+
+        <form method="post" action="{{ path('friend_create') }}"
+              class="element">
+            <input type="hidden" name="_method" value="POST">
+            <input type="email" name="email" placeholder="Votre email">
+
+            <button class="btn btn-success">Ajouter</button>
+        </form>
+
+
+
+
+    {% else %}
+        <div class="jumbotron">
+            <p>Pour utiliser notre plateforme veuillez vous connecter ou vous inscrire !</p>
+        </div>
+    {% endif %}
 {% endblock %}
