@@ -4,9 +4,15 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Album;
+use App\Entity\UserAlbum;
 use App\Entity\Photo;
+use App\Entity\Mosaic;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\PhotoRepository;
+
 
 
 class PhotoController extends AbstractController
@@ -35,5 +41,37 @@ class PhotoController extends AbstractController
     	$em->persist($photo);
     	$em->flush();
     	return new JsonResponse(array('success' => true, "src"=>$photo->getImageName()));
+    }
+
+    /**
+     * @Route("/photo/create", name="create_album_from_photos")
+     * @todo Check if photo belongs to the right user
+     */
+    public function createAlbum(Request $request, ObjectManager $em)
+    {
+    	$photo_ids = $request->request->get('photos');
+    	if (! $photo_ids) {
+    		return new JsonResponse(array('success' => false));
+    	}
+
+    	$user = $this->getUser();
+    	$album = new Album();
+    	$album->setTitle("Nouvel album");
+    	$userAlbum = new UserAlbum();
+    	$userAlbum->setAlbum($album)
+    		->setUser($user)
+    		->setIsEditable(true);
+    	$em->persist($album);
+    	$em->persist($userAlbum);
+    	
+    	foreach ($photo_ids as $id) {
+    		$photo = $this->getDoctrine()->getRepository(Photo::class)->find($id);
+    		$mosaic = new Mosaic();
+    		$mosaic->setPhoto($photo)->setAlbum($album);
+    		$em->persist($mosaic);
+    	}
+    	
+    	$em->flush();
+    	return new JsonResponse(array('success' => true, 'album' => $userAlbum->getId() ));
     }
 }
