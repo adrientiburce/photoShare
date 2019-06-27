@@ -2,35 +2,88 @@
 
 {% block title %}PhotoShare - Photos{% endblock %}
 
-{% block body %}
-    <h1 class="text-center display-4 text-secondary">Photos</h1>
-    <div class="block-2-column">
-        <div class="container-photo">
-            <h2>Mes Photos</h2>
-            <p class="text-right">
-                <a class="btn btn-secondary text" href="{{ path('album_create') }}">Ajouter une photo</a>
-            </p>
-            <div class="photos">
-                <img src="./images/news.jpg" class="img-fluid show_pic" alt="img1" data-toggle="modal" data-target="#showPictureModal">
-                <img src="./images/screen.png" class="img-fluid show_pic" alt="img1" data-toggle="modal" data-target="#showPictureModal">
-                <img src="./images/shot.png" class="img-fluid show_pic" alt="img1" data-toggle="modal" data-target="#showPictureModal">
-            </div>
-            <p class="text-right">
-                <a class="btn btn-secondary text" href="{{ path('album_create') }}">Créer un album à partir des photos sélectionnées</a>
-            </p>
+{% block stylesheets %}
+    {{ parent() }}
+    <style type="text/css">
+        .upload-area h1{
+            text-align: center;
+            font-weight: normal;
+            font-family: sans-serif;
+            line-height: 50px;
+            color: darkslategray;
+        }
 
-        </div>
-        <div class="container-photo">
-            <h2>Photos partagées </h2>
-            <div class="photos">
-                <img src="./images/news.jpg" class="img-fluid show_pic" alt="img1" data-toggle="modal" data-target="#showPictureModal">
-                <img src="./images/screen.png" class="img-fluid show_pic" alt="img1" data-toggle="modal" data-target="#showPictureModal">
-                <img src="./images/shot.png" class="img-fluid show_pic" alt="img1" data-toggle="modal" data-target="#showPictureModal">
+        #file{
+            display: none;
+        }
+
+        .thumbnail {
+            margin: 10px;
+            width: 20%;
+            min-width: 16em;
+            border-radius: 10px;
+            /*box-shadow: 0 2px 6px 0 #c3c3c3;*/
+            border: 1px solid #dfe1e5;
+            padding: 5px;
+            transition: all 0.5s;     
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .upload-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            border-radius: 10px;
+            border: 3px solid transparent;
+            background-color: white;
+            transition: all 0.2s;
+        }
+
+        #upload-btn:hover{
+            cursor: pointer;
+        }
+
+        .title{
+            font-size:12px;
+        }
+
+        img{
+            width: 100%;
+            border-radius: 10px;
+        }
+
+/*        img:hover {
+            transform: scale(1.1);
+        }*/
+
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1 class="text-center display-4 text-secondary">Mes Photos</h1>   
+    <p id="drop-info"> ou glissez-déposez </p>
+        <div class="upload-area"  id="uploadfile">
+            <input type="file" name="file" id="file">
+            <div class="thumbnail" id="upload-btn">
+                <img src="../images/plus.png">
             </div>
-            <p class="text-right">
-                <a class="btn btn-secondary text" href="{{ path('album_create') }}">Ajouter à mes photos</a>
-            </p>
+            {% for photo in user.myPhotos %}
+            <div class="thumbnail">
+                <img src="{{ "../uploads/img/" ~ photo.imageName }}" draggable="false">
+            </div>
+                {% endfor %}
         </div>
+
+
+        <p class="text-right">
+            <a class="btn btn-secondary text" href="{{ path('album_create') }}">Créer un album à partir des photos sélectionnées</a>
+        </p>
+
     </div>
 
     <!-- Modal -->
@@ -49,4 +102,98 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script type="text/javascript">
+$(document).ready(function() {
+    // pour éviter que le navigateur n'affiche l'image
+    $("html").on("dragover", function(e) {
+       e.preventDefault();
+       e.stopPropagation();
+       $(".upload-area").css({"background-color": ' #fafdff', 'border-color': '#68a2d4', 'border-style' : 'dotted'})
+       $("#drop-info").text("Glissez ici !");
+    });
+
+    $("html").on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
+
+    $('.upload-area').on('dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(".upload-area").css({"background-color": ' #dce8f5', 'border-color': '#68a2d4', 'border-style' : 'dotted'})
+        $("#drop-info").text("Déposez");
+    });
+
+    $('html').on('dragleave', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("Leave");
+        $(".upload-area").css({"background-color": 'white', 'border-color': 'transparent', 'border-style' : 'solid'});
+        $("#drop-info").text("Glissez ici !");
+    })
+
+    // Drop
+    $('.upload-area').on('drop', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(".upload-area").css({"background-color": 'white', 'border-color': 'transparent', 'border-style' : 'solid'});
+
+        $("#drop-info").text("Téléversement en cours");
+
+        var file = e.originalEvent.dataTransfer.files;
+        var fd = new FormData();
+
+        fd.append('file', file[0]);
+        uploadData(fd);
+    });
+
+    // ou au clic
+    $("#upload-btn").click(function(){
+        $("#file").click(); //on clique sur le file input caché
+    });
+
+    // file selected
+    $("#file").change(function(){
+        var fd = new FormData();
+
+        var files = $('#file')[0].files[0];
+
+        fd.append('file',files);
+
+        uploadData(fd);
+    });
+});
+
+function uploadData(fd){
+    console.log("Upload");
+    console.log(fd);
+    $.ajax({
+        type: 'POST',
+        url: '{{ path('photo_upload') }}',
+        data: fd,
+        contentType: false,
+        processData: false,
+        dataType: 'json',
+        success: function(response){
+            console.log(response);
+            addThumbnail(response);
+        }
+    });
+}
+
+// Added thumbnail
+function addThumbnail(data){
+    $("#drop-info").text("Glissez ici !");
+    var src = data.src;
+
+    // Creating an thumbnail
+    var thumbnail = $('<div class="thumbnail">')
+        .append('<img src="../uploads/img/' +src+'" width="100%" height="78%">')
+        .append('<span class="size">' + "title" + '<span>');
+    $("#uploadfile").append(thumbnail);
+
+}
+
+</script>
 {% endblock %}
