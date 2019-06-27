@@ -37,6 +37,11 @@
             /*float: left;*/
         }
 
+
+        #upload-btn:hover{
+            cursor: pointer;
+        }
+
         .title{
             font-size:12px;
         }
@@ -54,10 +59,13 @@
 
     <div>
         <input type="file" name="file" id="file">
-        <button type="button" class="btn btn-primary" id="upload-btn">Téléverser</button>
         <p id="drop-info"> ou glissez-déposez </p>
 
         <div class="upload-area"  id="uploadfile">
+            <div class="thumbnail" id="upload-btn">
+                <img src="">
+                <span class="title">+</span>
+            </div>
             {% for mosaic in album.mosaics %}
             <div class="thumbnail">
                 <img src="{{ "../uploads/img/" ~ mosaic.photo.imageName }}">

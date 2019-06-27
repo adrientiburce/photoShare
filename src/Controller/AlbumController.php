@@ -24,6 +24,7 @@ class AlbumController extends AbstractController
     {
         $user = $this->getUser();
         return $this->render('album/index.html.twig', [
+            'user' => $user
         ]);
     }
 

@@ -2,21 +2,67 @@
 
 {% block title %}PhotoShare - Album{% endblock %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	<style type="text/css">
+
+		.frame{
+			background-size: cover;
+			width: 100%;
+			height: 100%;
+			background-position: center;
+		}
+
+		.thumbnail{
+			width: 200px;
+			height: 200px;
+			display: inline-block;
+			position: relative;
+			margin: 5px;
+		}
+
+		.thumbnail:hover{
+			cursor: pointer;
+		}
+
+		.title {
+			position: absolute;
+			bottom: 0px;
+			background-color: #dbdddec9;
+			width: 190px;
+			left: 0;
+			margin: 0.25em;
+			text-align: center;
+		}
+
+		.container{
+			text-align: center;
+		}
+
+	</style>
+{% endblock %}
+
 {% block body %}
-    <h1 class="text-center display-4 text-secondary">Albums</h1>
+	<h1 class="text-center display-4 text-secondary">Albums</h1>
 
-    <div class="block-2-column">
-        <div class="container-photo">
-            <h2>Mes Albums</h2>
-            <p class="text-right">
-                <a class="btn btn-secondary text" href="{{ path('album_create') }}">Créer un album</a>
-            </p>
+	<div class="container">
+<!-- 		<p class="text-right">
+			<a class="btn btn-secondary text" href="{{ path('album_create') }}">Créer un album</a>
+		</p> -->
+		
 
-        </div>
+		<div class="thumbnail img-thumbnail">
+			<div class="frame" style="background-image:url('../images/plus.png')" onclick="window.location='{{ path('album_create') }}';"></div>
+		</div>
+		{% for userAlbum in user.userAlbums %}
+		{% set album = userAlbum.album %}
+		{% set imgSrc = (album.mosaics|length) ? "../uploads/img/" ~ album.mosaics[0].photo.imageName : "../images/news.jpg" %}
+		<div class="thumbnail img-thumbnail">
+			<div class="frame" style="background-image:url('{{imgSrc}}')" onclick="window.location='{{ path('album_view', {"id":userAlbum.id}) }}';"></div>
+			<span class="title">{{ album.title }}</span>
+		</div>
+		{% endfor %}
 
-        <div class="container-photo">
-            <h2>Mes Albums partagés</h2>
+	</div>
 
-        </div>
-    </div>
 {% endblock %}
