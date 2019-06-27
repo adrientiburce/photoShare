@@ -3,16 +3,16 @@
 {% block title %}PhotoShare - Album{% endblock %}
 
 {% block stylesheets %}
-	{{ parent() }}
-	<style type="text/css">
+    {{ parent() }}
+    <style type="text/css">
 
-		.frame{
-			background-size: cover;
-			width: 100%;
-			height: 100%;
-			background-position: center;
-		}
-
+        .frame {
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+            background-position: center;
+        }
+        
 		.thumbnail{
 			width: 200px;
 			height: 200px;
@@ -27,58 +27,75 @@
 			transform: scale(1.1);
 		}
 
-		.title {
-			position: absolute;
-			bottom: 0px;
-			background-color: #dbdddec9;
-			width: 190px;
-			left: 0;
-			margin: 0.25em;
-			text-align: center;
-		}
+        .title {
+            position: absolute;
+            bottom: 0px;
+            background-color: #dbdddec9;
+            width: 190px;
+            left: 0;
+            margin: 0.25em;
+            text-align: left;
+        }
 
-		.editable {
-			position: absolute;
-			top: 4px;
-			right: 4px;
-			background-color: #e2e4e5;
-			width: 24px;
-			border-bottom-left-radius: 6px;
-		}
+        .editable {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: #e2e4e5;
+            width: 24px;
+            border-bottom-left-radius: 6px;
+        }
 
-		.container{
-			text-align: center;
-		}
+        .container {
+            text-align: center;
+        }
 
-	</style>
+        .dropdown {
+            float: right;
+        }
+
+        .title_text {
+            margin-left: 5px;
+        }
+
+    </style>
 {% endblock %}
 
 {% block body %}
-	<h1 class="text-center display-4 text-secondary">Albums</h1>
+    <h1 class="text-center display-4 text-secondary">Mes Albums</h1>
 
-	<div class="container">
-<!-- 		<p class="text-right">
-			<a class="btn btn-secondary text" href="{{ path('album_create') }}">Créer un album</a>
-		</p> -->
-		
+    <div class="container">
 
-		<div class="thumbnail img-thumbnail">
-			<div class="frame" style="background-image:url('../images/plus.png')" onclick="window.location='{{ path('album_create') }}';"></div>
-		</div>
-		{% for userAlbum in user.userAlbums %}
-		{% set album = userAlbum.album %}
-		{% set imgSrc = (album.mosaics|length) ? "../uploads/img/" ~ album.mosaics[0].photo.imageName : "../images/empty-album.png" %}
-		<div class="thumbnail img-thumbnail">
-			<div class="frame" style="background-image:url('{{imgSrc}}')" onclick="window.location='{{ path('album_view', {"id":userAlbum.id}) }}';"></div>
-			<span class="title">{{ album.title }}</span>
-			{% if userAlbum.isEditable %}
-				<span class="editable"><i class="fas fa-pencil-alt"></i></span>
-			{% else %}
-				<span class="editable"><i class="fas fa-eye"></i></span>
-			{% endif %}
-		</div>
-		{% endfor %}
+        <div class="thumbnail img-thumbnail">
+            <div class="frame" style="background-image:url('../images/plus.png')"
+                 onclick="window.location='{{ path('album_create') }}';"></div>
+        </div>
+        {% for userAlbum in user.userAlbums %}
+            {% set album = userAlbum.album %}
+            {% set imgSrc = (album.mosaics|length) ? "../uploads/img/" ~ album.mosaics[0].photo.imageName : "../images/empty-album.png" %}
+            <div class="thumbnail img-thumbnail">
+                <div class="frame" style="background-image:url('{{ imgSrc }}')"
+                     onclick="window.location='{{ path('album_view', {"id":userAlbum.id}) }}';"></div>
+                <div class="title">
+                    <span class="title_text">{{ album.title }}</span>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" data-toggle="modal" data-target="#showDiapoModal_{{ album.id }}"><i class="fas fa-play text-success"></i>&nbsp;Lire</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-share text-primary"></i>&nbsp;Partager</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-plus text-info"></i>&nbsp;Ajouter à "Mes Photos"</a>
+                        </div>
+                    </div>
+                </div>
+                {% if userAlbum.isEditable %}
+                    <span class="editable"><i class="fas fa-pencil-alt"></i></span>
+                {% else %}
+                    <span class="editable"><i class="fas fa-eye"></i></span>
+                {% endif %}
+            </div>
+            {% include 'album/play_carousel.html.twig' %}
+        {% endfor %}
 
-	</div>
-
+    </div>
 {% endblock %}

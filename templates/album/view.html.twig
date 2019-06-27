@@ -72,12 +72,11 @@
 {% endblock %}
 {% block body %}
 
-    <h1 class="text-center display-4 text-secondary">Mon Album</h1>
-    <h2>Titre : {{album.title}}</h2>
+    <h1 class="text-center display-4 text-secondary">Album : {{album.title}}</h1>
 
     <div>
         <input type="file" name="file" id="file">
-        <p id="drop-info"> ou glissez-déposez </p>
+        <p id="drop-info"> Vous pouvez glisser-déposer vos photos pour les ajouter</p>
 
         <div class="upload-area"  id="uploadfile">
             <div class="thumbnail" id="upload-btn">

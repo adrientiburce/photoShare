@@ -1,0 +1,44 @@
+<div class="modal fade" id="showDiapoModal_{{ album.id }}" tabindex="-1" role="dialog" aria-labelledby="showDiapoLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="showDiapoLabel_{{ album.id  }}">{{ album.title }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="carousel">
+                    <div id="carouselAlbum_{{ album.id }}" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for mosaic in album.mosaics %}
+                                {% if mosaic == album.mosaics[0] %}
+                                    <div class="carousel-item active" data-interval="3000">
+                                        <img src="{{ "../uploads/img/" ~ mosaic.photo.imageName }}"
+                                             class="d-block w-100" alt="{{ mosaic.photo.imageName }}">
+                                    </div>
+                                {% else %}
+                                    <div class="carousel-item" data-interval="3000">
+                                        <img src="{{ "../uploads/img/" ~ mosaic.photo.imageName }}"
+                                             class="d-block w-100" alt="{{ mosaic.photo.imageName }}">
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselAlbum_{{ album.id }}" role="button"
+                           data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselAlbum_{{ album.id }}" role="button"
+                           data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

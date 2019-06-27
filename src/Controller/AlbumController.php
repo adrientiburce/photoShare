@@ -81,25 +81,31 @@ class AlbumController extends AbstractController
     /**
      * @Route("/album/{id}/upload", name="album_upload_photo", requirements={"id"="\d+"})
      */
-    public function uploadPhoto(UserAlbumRepository $repo, $id, Request $request)
+    public function uploadPhoto($id, UserAlbumRepository $repo, ObjectManager $manager, Request $request)
     {
         $user = $this->getUser();
         $userAlbum = $repo->findEditableFromUser($user, $id);
         $image = $request->files->get('file');
+
         $album = $userAlbum->getAlbum();
         $photo = new Photo();
-        $photo->addOwner($user);
-        $photo->setImageFile($request->files->get('file'));
+        $photo->addOwner($user)
+            ->setImageFile($image);
+
         $mosaic = new Mosaic();
-        $mosaic->setPhoto($photo)->setAlbum($album);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($photo);
-        $em->persist($mosaic);
-        $em->flush();
+        $mosaic->setPhoto($photo)
+            ->setAlbum($album);
+
+        $manager->persist($photo);
+        $manager->persist($mosaic);
+        $manager->flush();
 
 
         // return $this->redirectToRoute('album_home');
-        return new JsonResponse(array('success' => true, "src"=>$photo->getImageName()));
+        return new JsonResponse([
+            'success' => true,
+            'src' => $photo->getImageName()
+        ]);
     }
 
 
