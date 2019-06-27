@@ -138,12 +138,13 @@
 
 {% block javascripts %}
 {{ parent() }}
-{{ include('photo/_drag_js.html.twig')}}
+<script type="text/javascript" src="../assets/drag-drop.js"></script>
 <script type="text/javascript" src="../assets/add-photos.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         var url = "{{ path('create_album_from_photos') }}";
         addPhotos(url, callback);
+        dragAndDrop(url="{{ path('photo_upload') }}")
     });
 
     function callback (o, response){

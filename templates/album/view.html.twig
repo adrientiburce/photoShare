@@ -205,12 +205,13 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {{ include('photo/_drag_js.html.twig')}}
+    <script type="text/javascript" src="../assets/drag-drop.js"></script>
     <script type="text/javascript" src="../assets/add-photos.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             var url = "{{ path('add_photo_to_album', {'id':userAlbumId}) }}";
             addPhotos(url, callback);
+            dragAndDrop(url="{{ path('album_upload_photo', {'id':userAlbumId}) }}")
         });
         function callback(Photos){
             var mainDiv = $('#uploadfile');

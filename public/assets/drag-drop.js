@@ -1,4 +1,4 @@
-$(document).ready(function() {
+function dragAndDrop(url){
     
 
 
@@ -57,34 +57,34 @@ $(document).ready(function() {
 
         uploadData(fd);
     });
-});
 
-function uploadData(fd){
-    console.log("Upload");
-    console.log(fd);
-    $.ajax({
-        type: 'POST',
-        url: '{{ path('photo_upload') }}',
-        data: fd,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(response){
-            console.log(response);
-            addThumbnail(response);
-        }
-    });
-}
+    function uploadData(fd){
+        console.log("Upload");
+        console.log(fd);
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: fd,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(response){
+                console.log(response);
+                addThumbnail(response);
+            }
+        });
+    }
 
-// Added thumbnail
-function addThumbnail(data){
-    $("#drop-info").text("Glissez ici !");
-    var src = data.src;
+    // Added thumbnail
+    function addThumbnail(data){
+        $("#drop-info").text("Glissez ici !");
+        var src = data.src;
 
-    // Creating an thumbnail
-    var thumbnail = $('<div class="thumbnail">')
-        .append('<img src="../uploads/img/' +src+'" width="100%" height="78%">')
-        .append('<span class="size">' + "title" + '<span>');
-    $("#uploadfile").append(thumbnail);
+        // Creating an thumbnail
+        var thumbnail = $('<div class="thumbnail">')
+            .append('<img src="../uploads/img/' +src+'" width="100%" height="78%">');
+            // .append('<span class="size">' + "title" + '<span>');
+        $("#uploadfile").append(thumbnail);
 
+    }
 }
