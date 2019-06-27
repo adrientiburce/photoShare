@@ -31,6 +31,7 @@
         "vich/uploader-bundle": "^1.9"
     },
     "require-dev": {
+        "deployer/deployer": "^6.4",
         "doctrine/doctrine-fixtures-bundle": "^3.2",
         "symfony/debug-pack": "*",
         "symfony/maker-bundle": "^1.0",
