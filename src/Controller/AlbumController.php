@@ -74,7 +74,7 @@ class AlbumController extends AbstractController
         }
         return $this->render('album/view.html.twig', [
             'album' => $userAlbum->getAlbum(),
-            'id' => $userAlbum->getId(),
+            'userAlbumId' => $userAlbum->getId(),
         ]);
     }
 
@@ -106,6 +106,31 @@ class AlbumController extends AbstractController
             'success' => true,
             'src' => $photo->getImageName()
         ]);
+    }
+
+    /**
+     * @Route("/album/{id}/add", name="add_photo_to_album", requirements={"id"="\d+"})
+     */
+    public function addPhoto($id, Request $request, ObjectManager $em, UserAlbumRepository $repo)
+    {
+        $user = $this->getUser();
+        $userAlbum = $repo->findEditableFromUser($user, $id);
+        $album = $userAlbum->getAlbum();
+
+        $photo_ids = $request->request->get('photos');
+        if (! $photo_ids) {
+            return new JsonResponse(array('success' => false));
+        }
+     
+        foreach ($photo_ids as $id) {
+            $photo = $this->getDoctrine()->getRepository(Photo::class)->find($id);
+            $mosaic = new Mosaic();
+            $mosaic->setPhoto($photo)->setAlbum($album);
+            $em->persist($mosaic);
+        }
+        
+        $em->flush();
+        return new JsonResponse(array('success' => true, 'album' => $userAlbum->getId() ));
     }
 
 

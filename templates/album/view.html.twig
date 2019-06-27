@@ -39,6 +39,22 @@
             transform: scale(1.05);
         }
 
+        .photo{
+            position: relative;
+        }
+
+        .photo.selected::after {
+            position: absolute;
+            background-color: #00a5ff;
+            width: 12px;
+            height: 12px;
+            content: "";
+            bottom: 5px;
+            right: 5px;
+            border-radius: 7px;
+            border: 1px solid white;
+        }
+
         .upload-area {
             display: flex;
             flex-wrap: wrap;
@@ -49,6 +65,13 @@
             border: 3px solid transparent;
             background-color: white;
             transition: all 0.2s;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
         }
 
         #upload-btn:hover{
@@ -75,15 +98,16 @@
     <h1 class="text-center display-4 text-secondary">Album : {{album.title}}</h1>
 
     <div>
-        <input type="file" name="file" id="file">
         <p id="drop-info"> Vous pouvez glisser-déposer vos photos pour les ajouter</p>
 
         <div class="upload-area"  id="uploadfile">
-            <div class="thumbnail" id="upload-btn">
+            <div class="thumbnail" id="upload-btn" data-toggle="modal" data-target="#exampleModal">
                 <img src="../images/plus.png">
             </div>
+            {% set photoIds = [] %}
             {% for mosaic in album.mosaics %}
             <div class="thumbnail">
+                {% set photoIds = photoIds|merge([mosaic.photo.id]) %}
                 <img src="{{ "../uploads/img/" ~ mosaic.photo.imageName }}">
                 <span class="title">{{ mosaic.title }}</span>
             </div>
@@ -92,106 +116,57 @@
     </div>
 
 
+    <!-- Modal -->
+    <div class="modal fade modal-doc" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Sélectionnez des images parmi vos photos</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                {% for photo in app.user.myPhotos %}
+                    {% if not (photo.id in photoIds) %}
+                    <div class="photo thumbnail" data-id="{{ photo.id }}">
+                        <img src="{{ "../uploads/img/" ~ photo.imageName }}">
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <span id="photos-selected"></span>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="create-album" disabled>Ajouter</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
+<script type="text/javascript" src="../assets/add-photos.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-    // pour éviter que le navigateur n'affiche l'image
-    $("html").on("dragover", function(e) {
-       e.preventDefault();
-       e.stopPropagation();
-       $(".upload-area").css({"background-color": ' #fafdff', 'border-color': '#68a2d4', 'border-style' : 'dotted'})
-       $("#drop-info").text("Glissez ici !");
+    $(document).ready(function() {
+        var url = "{{ path('add_photo_to_album', {'id':userAlbumId}) }}";
+        addPhotos(url, callback);
     });
 
-    $("html").on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
-
-    // Drag enter
-    // $('.upload-area').on('dragenter', function (e) {
-    //     e.stopPropagation();
-    //     e.preventDefault();
-    //     $("#drop-info").text("Déposez");
-    // });
-
-    // Drag over
-    $('.upload-area').on('dragover', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        $(".upload-area").css({"background-color": ' #dce8f5', 'border-color': '#68a2d4', 'border-style' : 'dotted'})
-        $("#drop-info").text("Déposez");
-    });
-
-    $('html').on('dragleave', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        console.log("Leave");
-        $(".upload-area").css({"background-color": 'white', 'border-color': 'transparent', 'border-style' : 'solid'});
-        $("#drop-info").text("Glissez ici !");
-    })
-
-    // Drop
-    $('.upload-area').on('drop', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        $(".upload-area").css({"background-color": 'white', 'border-color': 'transparent', 'border-style' : 'solid'});
-
-        $("#drop-info").text("Téléversement en cours");
-
-        var file = e.originalEvent.dataTransfer.files;
-        var fd = new FormData();
-
-        fd.append('file', file[0]);
-        uploadData(fd);
-    });
-
-    // ou au clic
-    $("#upload-btn").click(function(){
-        $("#file").click(); //on clique sur le file input caché
-    });
-
-    // file selected
-    $("#file").change(function(){
-        var fd = new FormData();
-
-        var files = $('#file')[0].files[0];
-
-        fd.append('file',files);
-
-        uploadData(fd);
-    });
-});
-
-function uploadData(fd){
-    console.log("Upload");
-    console.log(fd);
-    $.ajax({
-        type: 'POST',
-        url: '{{ path('album_upload_photo', {"id":id}) }}',
-        data: fd,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(response){
-            console.log(response);
-            addThumbnail(response);
+    function callback(Photos){
+        var mainDiv = $('#uploadfile');
+        for (var i = Photos.length - 1; i >= 0; i--) {
+            Photos[i].detach()
+                .appendTo(mainDiv)
+                .removeClass("photo")
+                .removeClass("selected")
+                .unbind("click");
         }
-    });
-}
-
-// Added thumbnail
-function addThumbnail(data){
-    $("#drop-info").text("Glissez ici !");
-    var src = data.src;
-
-    // Creating an thumbnail
-    var thumbnail = $('<div class="thumbnail">')
-        .append('<img src="../uploads/img/' +src+'" width="100%" height="78%">')
-        .append('<span class="size">' + "title" + '<span>');
-    $("#uploadfile").append(thumbnail);
-
-}
-
+        $("#exampleModal").modal("hide");
+    };
 </script>
 {% endblock %}
