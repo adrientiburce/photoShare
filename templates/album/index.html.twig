@@ -35,6 +35,15 @@
 			text-align: center;
 		}
 
+		.editable {
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			background-color: #e2e4e5;
+			width: 24px;
+			border-bottom-left-radius: 6px;
+		}
+
 		.container{
 			text-align: center;
 		}
@@ -56,10 +65,15 @@
 		</div>
 		{% for userAlbum in user.userAlbums %}
 		{% set album = userAlbum.album %}
-		{% set imgSrc = (album.mosaics|length) ? "../uploads/img/" ~ album.mosaics[0].photo.imageName : "../images/news.jpg" %}
+		{% set imgSrc = (album.mosaics|length) ? "../uploads/img/" ~ album.mosaics[0].photo.imageName : "../images/empty-album.png" %}
 		<div class="thumbnail img-thumbnail">
 			<div class="frame" style="background-image:url('{{imgSrc}}')" onclick="window.location='{{ path('album_view', {"id":userAlbum.id}) }}';"></div>
 			<span class="title">{{ album.title }}</span>
+			{% if userAlbum.isEditable %}
+				<span class="editable"><i class="fas fa-pencil-alt"></i></span>
+			{% else %}
+				<span class="editable"><i class="fas fa-eye"></i></span>
+			{% endif %}
 		</div>
 		{% endfor %}
 

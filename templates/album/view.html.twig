@@ -4,17 +4,14 @@
 {% block stylesheets %}
     {{ parent() }}
     <style type="text/css">
-        .upload-area{
+/*        .upload-area{
             width: 100%;
             min-height: 200px;
             border: 2px solid lightgray;
             border-radius: 3px;
-            /*margin: 0 auto;*/
-            /*margin-top: 100px;*/
             text-align: center;
-            /*overflow: auto;*/
         }
-
+*/
         .upload-area h1{
             text-align: center;
             font-weight: normal;
@@ -28,15 +25,35 @@
         }
 
         /* Thumbnail */
-        .thumbnail{
+/*        .thumbnail{
             width: 80px;
             height: 80px;
             padding: 2px;
             border: 2px solid lightgray;
             border-radius: 3px;
-            /*float: left;*/
+        }*/
+
+        .thumbnail {
+            margin: 10px;
+            width: 20%;
+            min-width: 16em;
         }
 
+        .thumbnail:hover img {
+            transform: scale(1.1);
+        }
+
+        .upload-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            border-radius: 10px;
+            border: 3px solid transparent;
+            background-color: white;
+            transition: all 0.2s;
+        }
 
         #upload-btn:hover{
             cursor: pointer;
@@ -47,8 +64,13 @@
         }
 
         img{
-            width: 100%
+            width: 100%;
+            transition: all 0.5s;     
         }
+
+/*        img:hover {
+            transform: scale(1.1);
+        }*/
 
     </style>
 {% endblock %}
@@ -63,8 +85,7 @@
 
         <div class="upload-area"  id="uploadfile">
             <div class="thumbnail" id="upload-btn">
-                <img src="">
-                <span class="title">+</span>
+                <img src="../images/plus.png">
             </div>
             {% for mosaic in album.mosaics %}
             <div class="thumbnail">
@@ -86,29 +107,40 @@ $(document).ready(function() {
     $("html").on("dragover", function(e) {
        e.preventDefault();
        e.stopPropagation();
+       $(".upload-area").css({"background-color": ' #fafdff', 'border-color': '#68a2d4', 'border-style' : 'dotted'})
        $("#drop-info").text("Glissez ici !");
     });
 
     $("html").on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
 
     // Drag enter
-    $('.upload-area').on('dragenter', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        $("#drop-info").text("Déposez");
-    });
+    // $('.upload-area').on('dragenter', function (e) {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     $("#drop-info").text("Déposez");
+    // });
 
     // Drag over
     $('.upload-area').on('dragover', function (e) {
         e.stopPropagation();
         e.preventDefault();
+        $(".upload-area").css({"background-color": ' #dce8f5', 'border-color': '#68a2d4', 'border-style' : 'dotted'})
         $("#drop-info").text("Déposez");
     });
+
+    $('html').on('dragleave', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("Leave");
+        $(".upload-area").css({"background-color": 'white', 'border-color': 'transparent', 'border-style' : 'solid'});
+        $("#drop-info").text("Glissez ici !");
+    })
 
     // Drop
     $('.upload-area').on('drop', function (e) {
         e.stopPropagation();
         e.preventDefault();
+        $(".upload-area").css({"background-color": 'white', 'border-color': 'transparent', 'border-style' : 'solid'});
 
         $("#drop-info").text("Téléversement en cours");
 
@@ -155,7 +187,7 @@ function uploadData(fd){
 
 // Added thumbnail
 function addThumbnail(data){
-    $("#uploadfile h1").remove(); 
+    $("#drop-info").text("Glissez ici !");
     var src = data.src;
 
     // Creating an thumbnail
