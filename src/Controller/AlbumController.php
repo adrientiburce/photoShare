@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Album;
 use App\Entity\UserAlbum;
+use App\Entity\Photo;
+use App\Entity\Mosaic;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 class AlbumController extends AbstractController
@@ -59,7 +62,7 @@ class AlbumController extends AbstractController
     /**
      * @Route("/album/{id}", name="album_view", requirements={"id"="\d+"})
      */
-    public function viewAlbumBis(UserAlbumRepository $repo, $id)
+    public function viewAlbum(UserAlbumRepository $repo, $id)
     {
         $user = $this->getUser();
         $userAlbum = $repo->findEditableFromUser($user, $id);
@@ -70,27 +73,33 @@ class AlbumController extends AbstractController
         }
         return $this->render('album/view.html.twig', [
             'album' => $userAlbum->getAlbum(),
+            'id' => $userAlbum->getId(),
         ]);
     }
 
-//    /**
-//     * @Route("/album/{id}", name="album_view")
-//     */
-//    public function viewAlbum($id="")
-//    {
-//        $user = $this->getUser();
-//        if($id=="" || !is_numeric($id))
-//            return $this->redirectToRoute('album_home');
-//        $repo = $this->getDoctrine()->getRepository(UserAlbum::class);
-//        $userAlbum = $repo->find(\intval($id));
-//        if ($userAlbum->getUser()->getId() != $user->getId() || !$userAlbum->getIsEditable()){
-//            $this->addFlash('warning', "Vous n'êtes pas autorisé à effectuer cette action");
-//            return $this->redirectToRoute('album_home');
-//        }
-//        return $this->render('album/view.html.twig', [
-//            'album' => $userAlbum->getAlbum(),
-//        ]);
-//    }
+    /**
+     * @Route("/album/{id}/upload", name="album_upload_photo", requirements={"id"="\d+"})
+     */
+    public function uploadPhoto(UserAlbumRepository $repo, $id, Request $request)
+    {
+        $user = $this->getUser();
+        $userAlbum = $repo->findEditableFromUser($user, $id);
+        $image = $request->files->get('file');
+        $album = $userAlbum->getAlbum();
+        $photo = new Photo();
+        $photo->addOwner($user);
+        $photo->setImageFile($request->files->get('file'));
+        $mosaic = new Mosaic();
+        $mosaic->setPhoto($photo)->setAlbum($album);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($photo);
+        $em->persist($mosaic);
+        $em->flush();
+
+
+        // return $this->redirectToRoute('album_home');
+        return new JsonResponse(array('success' => true, "src"=>$photo->getImageName()));
+    }
 
 
 }

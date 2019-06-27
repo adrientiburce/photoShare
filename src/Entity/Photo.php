@@ -42,10 +42,10 @@ class Photo
      * @ORM\Column(type="string", length=255)
      * @var string
      */
-    private $image;
+    private $imageName;
 
     /**
-     * @Vich\UploadableField(mapping="images", fileNameProperty="image")
+     * @Vich\UploadableField(mapping="photos_images", fileNameProperty="imageName")
      * @var File
      */
     private $imageFile;
@@ -148,13 +148,13 @@ class Photo
         return $this->imageFile;
     }
 
-    public function setImage($image)
+    public function setImageName($image)
     {
-        $this->image = $image;
+        $this->imageName = $image;
     }
 
-    public function getImage()
+    public function getImageName()
     {
-        return $this->image;
+        return $this->imageName;
     }
 }
