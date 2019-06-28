@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfileController!{% endblock %}
+{% block title %}PhotoShare - Mon compte{% endblock %}
 
 {% block body %}
-
+    <div class="container">
 
     <h1 class="text-center display-4 text-secondary">Mon Compte</h1>
 
@@ -12,11 +12,19 @@
         <tbody>
         <tr>
             <th>Nombre d'albums</th>
-            <td></td>
+            {% if app.user.userAlbums %}
+                <td>{{ app.user.userAlbums|length }}</td>
+            {% else %}
+                <td>Vous avez aucun album</td>
+            {% endif %}
         </tr>
         <tr>
             <th>Nombre de photos</th>
-            <td></td>
+            {% if app.user.myPhotos %}
+            <td>{{ app.user.myPhotos|length }}</td>
+            {% else %}
+            <td>Vous avez aucune photo</td>
+            {% endif %}
         </tr>
         </tbody>
     </table>

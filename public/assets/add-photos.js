@@ -2,7 +2,7 @@ function addPhotos(url, callback){
 
     var count = 0;
 
-    $(".photo").click(function(){
+    $(document).on("click", ".photo", function(){
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
             if (count > 0) count --;
@@ -12,6 +12,8 @@ function addPhotos(url, callback){
         }
         majNbPhotos(count);
     });
+
+    // $(".photo").click(;
 
     $("#create-album").click(function(){
         var IDs = [];

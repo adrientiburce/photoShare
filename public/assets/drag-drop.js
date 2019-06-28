@@ -1,4 +1,4 @@
-function dragAndDrop(url){
+function dragAndDrop(url, classAfterDrag = ""){
     
 
 
@@ -81,7 +81,7 @@ function dragAndDrop(url){
         var src = data.src;
 
         // Creating an thumbnail
-        var thumbnail = $('<div class="thumbnail">')
+        var thumbnail = $('<div class="thumbnail">').addClass(classAfterDrag)
             .append('<img src="../uploads/img/' +src+'" width="100%" height="78%">');
             // .append('<span class="size">' + "title" + '<span>');
         $("#uploadfile").append(thumbnail);

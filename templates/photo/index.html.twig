@@ -78,7 +78,7 @@
     $(document).ready(function() {
         var url = "{{ path('create_album_from_photos') }}";
         addPhotos(url, callback);
-        dragAndDrop(url="{{ path('photo_upload') }}")
+        dragAndDrop(url="{{ path('photo_upload') }}", classAfterDrag = "photo")
     });
 
     function callback (o, response){

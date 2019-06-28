@@ -52,10 +52,11 @@ class AlbumController extends AbstractController
                 ->setUser($user)
                 ->setIsEditable(true)
                 ->setIsOwner(true);
-            //$em = $this->getDoctrine()->getManager();
             $manager->persist($album);
             $manager->persist($userAlbum);
             $manager->flush();
+
+            $this->addFlash("success", "Album créé, cliquer sur le titre pour le modifer");
             return $this->redirectToRoute('album_view', [
                 'id' => $userAlbum->getId()
             ]);
