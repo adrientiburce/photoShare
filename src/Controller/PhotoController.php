@@ -60,6 +60,7 @@ class PhotoController extends AbstractController
     	$userAlbum = new UserAlbum();
     	$userAlbum->setAlbum($album)
     		->setUser($user)
+            ->setIsOwner(true)
     		->setIsEditable(true);
     	$em->persist($album);
     	$em->persist($userAlbum);
