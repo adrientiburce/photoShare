@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -11,10 +12,11 @@ use App\Entity\UserAlbum;
 use App\Entity\Photo;
 use App\Entity\Mosaic;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Repository\PhotoRepository;
 
 
-
+/**
+ * @IsGranted("ROLE_USER")
+ */
 class PhotoController extends AbstractController
 {
     /**

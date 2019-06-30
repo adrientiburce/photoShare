@@ -5,11 +5,15 @@ namespace App\Controller;
 use App\Form\ChangePasswordType;
 use App\Form\Model\ChangePassword;
 use Doctrine\Common\Persistence\ObjectManager;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+/**
+ * @IsGranted("ROLE_USER")
+ */
 class ProfileController extends AbstractController
 {
     /**
