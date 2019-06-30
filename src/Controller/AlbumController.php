@@ -10,6 +10,7 @@ use App\Repository\FriendshipRepository;
 use App\Repository\UserAlbumRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,9 @@ use App\Entity\Mosaic;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 
+/**
+ * @IsGranted("ROLE_USER")
+ */
 class AlbumController extends AbstractController
 {
     /**
@@ -79,7 +83,6 @@ class AlbumController extends AbstractController
             $this->addFlash('warning', "Vous n'êtes pas autorisé à effectuer cette action");
             return $this->redirectToRoute('album_home');
         }
-        dump($userAlbum);
 
         $allUserAlbum = $userAlbumRepo->findAllShare($userAlbum->getAlbum());
         foreach ($allUserAlbum as $k => $userAlbumValue) {
