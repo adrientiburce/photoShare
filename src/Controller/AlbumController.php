@@ -2,24 +2,25 @@
 
 namespace App\Controller;
 
+use App\Entity\Album;
+use App\Entity\Mosaic;
+use App\Entity\Photo;
 use App\Entity\User;
+use App\Entity\UserAlbum;
 use App\Form\AlbumType;
 use App\Form\UserAlbumType;
-use App\Repository\AlbumRepository;
-use App\Repository\FriendshipRepository;
 use App\Repository\UserAlbumRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Album;
-use App\Entity\UserAlbum;
-use App\Entity\Photo;
-use App\Entity\Mosaic;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Annotation\Route;
+use ZipArchive;
 
 
 /**
@@ -27,6 +28,85 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class AlbumController extends AbstractController
 {
+    const CAR_IN = array(
+        'coffre_ouvert' => 36,
+        'commande_volant_droit' => 27,
+        'commande_volant_gauche' => 26,
+        'compteur' => 25,
+        'banquette_arriere' => 33,
+        'banquette_arriere_jambes' => 34,
+        'boite_a_gant_ouverte' => 32,
+        'levier_de_vitesse' => 30,
+        'moteur' => 35,
+        'gps_multimedia' => 31,
+        'roue_de_secours' => 37,
+        'tableau_bord_epaule_conducteur' => 22,
+        'tableau_bord_epaule_passager' => 28,
+        'ensemble_tableau_bord' => 23,
+        'toit_ouvrant' => 41,
+        'transversal_conducteur' => 21,
+        'transversale_cote_passager' => 29,
+        'focus_volant' => 24,
+    );
+
+    const CAR_OUT = array(
+        'face_capot' => 2,
+        'jante_arriere_droit' => 16,
+        'jante_arriere_gauche' => 14,
+        'jante_avant_droit' => 15,
+        'jante_avant_gauche' => 13,
+        'profil_arriere_droit' => 5,
+        'profil_arriere_gauche' => 7,
+        'avant_droit' => 3,
+        'avant_gauche' => 1,
+        'aile_arriere_droite' => 12,
+        'aile_arriere_gauche' => 10,
+        'aile_avant_droite' => 11,
+        'aile_avant_gauche' => 9,
+        'arriere_coffre_ferme' => 6,
+        'focus_marque' => 39,
+        'focus_modele' => 40,
+        'porte_arriere_droite' => 20,
+        'porte_arriere_gauche' => 18,
+        'porte_avant_droite' => 19,
+        'porte_avant_gauche' => 17,
+        'profil_droit' => 4,
+        'profil_gauche' => 8
+    );
+
+    const CAR_PHOTOS = array(
+        // VOITURE INTERIEUR
+        "Intérieur " => self::CAR_IN,
+        // VOITURE EXTERIEUR
+        "Extérieur " => self::CAR_OUT,
+
+//        // PAPIERS
+//        'carnet_entretien_1' => 52,
+//        'carnet_entretien_2' => 53,
+//        'carnet_entretien_3' => 54,
+//        'carnet_entretien_4' => 55,
+//        'carnet_entretien_5' => 56,
+//        'certificat_immatriculation' => 1,
+//        'cle_carnet_entretien' => 38,
+//        'controle_technique' => 2,
+//        'facture_entretien_1' => 4,
+//        'facture_entretien_2' => 5,
+//        'facture_entretien_3' => 6,
+//        'facture_entretien_4' => 7,
+//
+//        // LIBRE
+//        'photo_libre_1' => 42,
+//        'photo_libre_10' => 51,
+//        'photo_libre_2' => 43,
+//        'photo_libre_3' => 44,
+//        'photo_libre_4' => 45,
+//        'photo_libre_5' => 46,
+//        'photo_libre_6' => 47,
+//        'photo_libre_7' => 48,
+//        'photo_libre_8' => 49,
+//        'photo_libre_9' => 50,
+    );
+
     /**
      * @Route("/album", name="album_home")
      */
@@ -131,8 +211,48 @@ class AlbumController extends AbstractController
             'album' => $userAlbum->getAlbum(),
             'userAlbumId' => $userAlbum->getId(),
             'allUserAlbum' => $allUserAlbum,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'carPhotos' => self::CAR_PHOTOS
         ]);
+    }
+
+    /**
+     * @Route("/album/download/{id}", name="album_download", requirements={"id"="\d+"})
+     */
+    public function dowloadAlbum($id, UserAlbumRepository $userAlbumRepo){
+        $user = $this->getUser();
+        /** @var UserAlbum $userAlbum */
+        $userAlbum = $userAlbumRepo->findEditableFromUser($user, $id);
+
+        if ($userAlbum == null) {
+            $this->addFlash('warning', "Vous n'êtes pas autorisé à effectuer cette action");
+            return $this->redirectToRoute('album_home');
+        }
+
+        $album = $userAlbum->getAlbum();
+        $mosaics = $album->getMosaics();
+        $photo = $mosaics[0]->getPhoto()->getImageName();
+        $photo1 = $mosaics[1]->getPhoto()->getImageName();
+
+        $path = $this->getParameter('kernel.project_dir') . '/public/uploads/img/';
+        $path1 = $this->getParameter('kernel.project_dir') . '/public/uploads/img/' . $photo1;
+        //var_dump($path);die;
+
+        $archive = new ZipArchive();
+        $archive->open($path);
+        $archive->addFromString("toto". '.php', "g");
+
+        $response = new Response(file_get_contents($archive->filename));
+
+        $d = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "toto" . '.zip');
+        $response->headers->set('Content-Disposition', $d);
+
+        $archive->close();
+
+        return $response;
+
+        #return $this->file($path);
+
     }
 
     /**
@@ -153,6 +273,7 @@ class AlbumController extends AbstractController
         $mosaic->setPhoto($photo)
             ->setAlbum($album);
 
+        var_dump($photo);die;
         $manager->persist($photo);
         $manager->persist($mosaic);
         $manager->flush();
@@ -211,8 +332,12 @@ class AlbumController extends AbstractController
     /**
      * @Route("/album/delete/{id}", name="user_album_delete", methods="DELETE", requirements={"id"="\d+"})
      */
-    public function removeUserAlbum(Request $request, UserAlbum $userAlbum, ObjectManager $manager, UserAlbumRepository $userAlbumRepo)
-    {
+    public function removeUserAlbum(
+        Request $request,
+        UserAlbum $userAlbum,
+        ObjectManager $manager,
+        UserAlbumRepository $userAlbumRepo
+    ) {
         $userAlbumIdFromOwner = $request->request->get('current_user_album');
         $manager->remove($userAlbum);
 

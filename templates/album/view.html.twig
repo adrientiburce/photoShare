@@ -13,7 +13,7 @@
             align-items: center;
         }
 
-        .editable{
+        .editable {
             cursor: pointer;
         }
 
@@ -29,72 +29,82 @@
         <h2 class="text-right text-info"><i class="fas fa-user-edit"></i>&nbsp; Contributeur</h2>
     {% endif %}
 
-{#         A D M I N   DE L'ALBUM#}
+    {#         A D M I N   DE L'ALBUM#}
     {% if userAlbum.isOwner %}
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shareAlbum">
-            Partager
-        </button>
+        {#        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shareAlbum">#}
+        {#            Partager#}
+        {#        </button>#}
         {% include 'album/share_modal.html.twig' %}
 
-        <h3 class="text-info mt-2">Mes Partages</h3>
-        {% if allUserAlbum|length > 0 %}
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Amis</th>
-                    <th>Autorisation</th>
-                    <th colspan="2">Actions</th>
-                </tr>
-                </thead>
+        <br>
+        <a class="btn btn-success" href="{{ path('album_download', {"id":userAlbum.id})}} " download>
+            Télécharger l'album
+        </a>
 
-                {% for externUserAlbum in allUserAlbum %}
-                    <tbody>
-                    <tr>
-                        <td>{{ externUserAlbum.user.email }}</td>
-                        <td>
-                            {% if externUserAlbum.isEditable %}
-                                <i class="fas fa-user-edit"></i>&nbsp;Edition
-                            {% else %}
-                                <i class="far fa-user"></i>&nbsp;Consultation
-                            {% endif %}
-                        </td>
-                        <td>
-                            <form method="post" action="{{ path('user_album_delete', {'id': externUserAlbum.id}) }}"
-                                  onsubmit="
-                    return confirm('Etes-vous sûr de supprimer le partage ?')">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <input type="hidden" name="current_user_album" value="{{userAlbum.id}}">
-                                <button class="btn btn-danger btn-sm">Supprimer</button>
-                            </form>
-                        </td>
-                        <td>
-                            <form method="post" action="{{ path('user_album_update', {'id': externUserAlbum.id}) }}">
-                                <input type="hidden" name="_method" value="POST">
-                                <input type="hidden" name="current_user_album" value="{{userAlbum.id}}">
-                                <button class="btn btn-outline-success btn-sm">
-                                    {% if externUserAlbum.isEditable %}
-                                        Enlever l'édition
-                                    {% else %}
-                                        Ajouter l'édition
-                                    {% endif %}
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#carPhotoModal">
+            Renommer une CarPhoto
+        </button>
 
-                    </tbody>
+        {#        <h3 class="text-info mt-2">Mes Partages</h3>#}
+        {#        {% if allUserAlbum|length > 0 %}#}
+        {#            <table class="table table-hover">#}
+        {#                <thead>#}
+        {#                <tr>#}
+        {#                    <th>Amis</th>#}
+        {#                    <th>Autorisation</th>#}
+        {#                    <th colspan="2">Actions</th>#}
+        {#                </tr>#}
+        {#                </thead>#}
 
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>Vous avez acutellement aucun partage</p>
-        {% endif %}
+        {#                {% for externUserAlbum in allUserAlbum %}#}
+        {#                    <tbody>#}
+        {#                    <tr>#}
+        {#                        <td>{{ externUserAlbum.user.email }}</td>#}
+        {#                        <td>#}
+        {#                            {% if externUserAlbum.isEditable %}#}
+        {#                                <i class="fas fa-user-edit"></i>&nbsp;Edition#}
+        {#                            {% else %}#}
+        {#                                <i class="far fa-user"></i>&nbsp;Consultation#}
+        {#                            {% endif %}#}
+        {#                        </td>#}
+        {#                        <td>#}
+        {#                            <form method="post" action="{{ path('user_album_delete', {'id': externUserAlbum.id}) }}"#}
+        {#                                  onsubmit="#}
+        {#                    return confirm('Etes-vous sûr de supprimer le partage ?')">#}
+        {#                                <input type="hidden" name="_method" value="DELETE">#}
+        {#                                <input type="hidden" name="current_user_album" value="{{ userAlbum.id }}">#}
+        {#                                <button class="btn btn-danger btn-sm">Supprimer</button>#}
+        {#                            </form>#}
+        {#                        </td>#}
+        {#                        <td>#}
+        {#                            <form method="post" action="{{ path('user_album_update', {'id': externUserAlbum.id}) }}">#}
+        {#                                <input type="hidden" name="_method" value="POST">#}
+        {#                                <input type="hidden" name="current_user_album" value="{{ userAlbum.id }}">#}
+        {#                                <button class="btn btn-outline-success btn-sm">#}
+        {#                                    {% if externUserAlbum.isEditable %}#}
+        {#                                        Enlever l'édition#}
+        {#                                    {% else %}#}
+        {#                                        Ajouter l'édition#}
+        {#                                    {% endif %}#}
+        {#                                </button>#}
+        {#                            </form>#}
+        {#                        </td>#}
+        {#                    </tr>#}
+
+        {#                    </tbody>#}
+
+        {#                {% endfor %}#}
+        {#            </table>#}
+        {#        {% else %}#}
+        {#            <p>Vous avez acutellement aucun partage</p>#}
+        {#        {% endif %}#}
     {% endif %}
+
 
     <div>
         <p id="drop-info"> Vous pouvez glisser-déposer vos photos pour les ajouter</p>
 
-        <div class="upload-area"  id="uploadfile">
+        <div class="upload-area" id="uploadfile">
             <div class="thumbnail" id="upload-btn" data-toggle="modal" data-target="#exampleModal">
                 <img src="../images/plus.png">
             </div>
@@ -110,33 +120,12 @@
     </div>
 
 
-    <!-- Modal -->
-    <div class="modal fade modal-doc" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Sélectionnez des images parmi vos photos</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {% for photo in app.user.myPhotos %}
-                        {% if not (photo.id in photoIds) %}
-                            <div class="photo thumbnail" data-id="{{ photo.id }}">
-                                <img src="{{ "../uploads/img/" ~ photo.imageName }}">
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <div class="modal-footer">
-                    <span id="photos-selected"></span>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary" id="create-album" disabled>Ajouter</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
+    {% include 'album/modal/addPhotoModal.html.twig' %}
+
+    {% include 'album/modal/selectCarPhoto.html.twig' %}
+
+
 
 
 
@@ -147,12 +136,13 @@
     <script type="text/javascript" src="../assets/drag-drop.js"></script>
     <script type="text/javascript" src="../assets/add-photos.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             var url = "{{ path('add_photo_to_album', {'id':userAlbumId}) }}";
             addPhotos(url, callback);
-            dragAndDrop(url="{{ path('album_upload_photo', {'id':userAlbumId}) }}")
+            dragAndDrop(url = "{{ path('album_upload_photo', {'id':userAlbumId}) }}")
         });
-        function callback(Photos){
+
+        function callback(Photos) {
             var mainDiv = $('#uploadfile');
             for (var i = Photos.length - 1; i >= 0; i--) {
                 Photos[i].detach()
@@ -163,12 +153,12 @@
             }
             $("#exampleModal").modal("hide");
         };
-        
-        /* Edition du titre de l'album 
+
+        /* Edition du titre de l'album
            code inspiré de celui de l'électif WEB 2.0 */
         var inputEditable = $("<input>")
-            .click(function(){$(this).select();})
-            .keydown(function(contexte){
+            .click(function () {$(this).select();})
+            .keydown(function (contexte) {
                 if (contexte.key == "Enter" && $(this).val()) {
                     var contenu = $(this).val();
                     var spanEditable = $("<span class='editable'>").html(contenu);
@@ -180,29 +170,29 @@
 
         function save(spanEditable) {
             // Interdire les futures modif
-            spanEditable.data("disabled",true);
+            spanEditable.data("disabled", true);
             spanEditable.addClass("disabled");
             var userAlbumId = '{{ userAlbumId }}';
             // Envoyer la requete
             $.ajax({
                 type: "POST",
-                url: "{{ path('album_set_title', {'id':userAlbumId}) }}" ,
-                data: {title : spanEditable.html()},
-                success: function(oRep){
+                url: "{{ path('album_set_title', {'id':userAlbumId}) }}",
+                data: {title: spanEditable.html()},
+                success: function (oRep) {
                     // OK !
                     // Il faut maj le P dans la structure
                     spanEditable.removeClass("disabled");
-                    spanEditable.data("disabled",false);
+                    spanEditable.data("disabled", false);
                 },
                 dataType: "json"
             });
 
         }
 
-        $(document).on("click",".editable", function(){
+        $(document).on("click", ".editable", function () {
             // Si l'élément est désactivé, on ne fait rien...
             if ($(this).data("disabled")) return;
-            
+
             var contenu = $(this).html();
             var newImputEditable = inputEditable.clone(true).val(contenu);
             $(this).replaceWith(newImputEditable);
